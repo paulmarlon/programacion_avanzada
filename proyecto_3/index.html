@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,7 +9,7 @@
 
 <!-- Bootstrap 5 CSS vía CDN -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<!-- Bootstrap Icons vía CDN (para íconos de botones) -->
+<!-- Bootstrap Icons vía CDN -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 <!-- Supabase JS Client CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -124,7 +126,6 @@
         object-fit:cover;
         border-radius:10px;
         border:2px dashed #ccc;
-        display:none;
     }
 
     /* ---------- Modal perfil completo ---------- */
@@ -163,7 +164,6 @@
 <!-- ======================= CABECERA INSTITUCIONAL ======================= -->
 <nav class="navbar navbar-usb navbar-dark py-3 mb-4">
     <div class="container d-flex align-items-center">
-        <!-- Logo institucional (SVG en línea con los colores de la USB) -->
         <svg class="logo-usb" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="50" r="48" fill="#003399" stroke="#FFCC00" stroke-width="4"/>
             <path d="M50 20c-8 0-14 6-14 14 0 6 4 10 8 13-9 3-16 11-16 21h44c0-10-7-18-16-21 4-3 8-7 8-13 0-8-6-14-14-14z" fill="#FFCC00"/>
@@ -230,11 +230,12 @@
             <div class="col-md-4">
                 <label class="form-label fw-bold">Fotografía</label>
                 <input type="file" class="form-control" id="foto" accept="image/*">
-                <img id="previewFoto" class="preview-foto mt-2" alt="Vista previa de la foto">
+                <!-- Se agregó 'd-none' para controlar la visibilidad con Bootstrap de forma limpia -->
+                <img id="previewFoto" class="preview-foto mt-2 d-none" alt="Vista previa de la foto">
             </div>
 
             <div class="col-12 text-end">
-                <button type="reset" class="btn btn-outline-secondary me-2">
+                <button type="reset" class="btn btn-outline-secondary me-2" id="btnLimpiar">
                     <i class="bi bi-arrow-counterclockwise"></i> Limpiar
                 </button>
                 <button type="submit" class="btn btn-usb-rojo">
@@ -257,7 +258,7 @@
     </div>
 
     <div id="galeria" class="row g-4 mb-5">
-        <!-- Las tarjetas de mascotas se insertan aquí dinámicamente mediante JavaScript -->
+        <!-- Tarjetas dinámicas -->
     </div>
 
 </div>
@@ -271,7 +272,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="modalBody">
-                <!-- Contenido dinámico del perfil de la mascota -->
+                <!-- Contenido dinámico -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-danger" id="btnEliminarModal">
@@ -291,24 +292,25 @@
     </div>
 </footer>
 
-<!-- Bootstrap 5 JS Bundle (incluye Popper) vía CDN -->
+<!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 // =========================================================================
-// CONFIGURACIÓN DE SUPABASE (REEMPLAZA CON TUS CREDENCIALES REALES)
+// CONFIGURACIÓN DE SUPABASE (PEGA TUS CREDENCIALES REALES AQUÍ)
 // =========================================================================
 const SUPABASE_URL = 'https://fzozfojjmunoyoelnfnf.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6U7tpTnmfPXv1k1olDGUmA_iYTREI4t';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let mascotas = []; // Arreglo sincronizado con Supabase
+let mascotas = []; 
 
 const galeria = document.getElementById('galeria');
 const formMascota = document.getElementById('formMascota');
 const inputFoto = document.getElementById('foto');
 const previewFoto = document.getElementById('previewFoto');
+const btnLimpiar = document.getElementById('btnLimpiar');
 const filtroEstado = document.getElementById('filtroEstado');
 const modalPerfilEl = document.getElementById('modalPerfil');
 const modalPerfil = new bootstrap.Modal(modalPerfilEl);
@@ -331,25 +333,32 @@ async function cargarDesdeSupabase() {
         renderizarGaleria();
     } catch (error) {
         console.error('Error al cargar de Supabase:', error.message);
-        alert('No se pudieron sincronizar las mascotas desde la nube.');
     }
 }
 
-// 2. MANEJO DE FOTO (FileReader a Base64)
+// 2. MANEJO DE FOTO (FileReader a Base64 corregido con Bootstrap)
 inputFoto.addEventListener('change', function(evento){
     const archivo = evento.target.files[0];
-    if(!archivo){
+    if (archivo) {
+        const lector = new FileReader();
+        lector.onload = function(e){
+            fotoBase64Temporal = e.target.result;
+            previewFoto.src = fotoBase64Temporal;
+            previewFoto.classList.remove('d-none'); // Muestra la imagen correctamente
+        };
+        lector.readAsDataURL(archivo);
+    } else {
         fotoBase64Temporal = '';
-        previewFoto.style.display = 'none';
-        return;
+        previewFoto.src = '';
+        previewFoto.classList.add('d-none'); // Oculta si se cancela
     }
-    const lector = new FileReader();
-    lector.onload = function(eventoLectura){
-        fotoBase64Temporal = eventoLectura.target.result;
-        previewFoto.src = fotoBase64Temporal;
-        previewFoto.style.display = 'block';
-    };
-    lector.readAsDataURL(archivo);
+});
+
+// Limpiar vista previa al hacer reset
+btnLimpiar.addEventListener('click', function(){
+    fotoBase64Temporal = '';
+    previewFoto.src = '';
+    previewFoto.classList.add('d-none');
 });
 
 // 3. REGISTRAR NUEVA MASCOTA EN SUPABASE (INSERT)
@@ -377,8 +386,10 @@ formMascota.addEventListener('submit', async function(evento){
 
         await cargarDesdeSupabase();
         formMascota.reset();
-        previewFoto.style.display = 'none';
+        previewFoto.src = '';
+        previewFoto.classList.add('d-none');
         fotoBase64Temporal = '';
+        alert('¡Mascota registrada con éxito en la nube!');
     } catch (error) {
         console.error('Error al registrar:', error.message);
         alert('Error al guardar en la base de datos de Supabase.');
@@ -502,7 +513,7 @@ function abrirPerfilCompleto(id){
 
 btnEliminarModal.addEventListener('click', async function(){
     if(idMascotaActiva === null) return;
-    const confirmar = confirm('¿Está seguro de eliminar este registro de la base de datos? Esta acción no se puede deshacer.');
+    const confirmar = confirm('¿Está seguro de eliminar este registro de la base de datos?');
     if(!confirmar) return;
 
     try {
@@ -524,7 +535,7 @@ btnEliminarModal.addEventListener('click', async function(){
 
 filtroEstado.addEventListener('change', renderizarGaleria);
 
-// Inicialización: cargamos los datos reales desde Supabase al iniciar
+// Inicialización automática
 cargarDesdeSupabase();
 </script>
 
