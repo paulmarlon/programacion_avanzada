@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -297,7 +296,7 @@
 
 <script>
 // =========================================================================
-// CONFIGURACIÓN DE SUPABASE (PEGA TUS CREDENCIALES REALES AQUÍ)
+// CONFIGURACIÓN DE SUPABASE (REEMPLAZA CON TUS CREDENCIALES REALES)
 // =========================================================================
 const SUPABASE_URL = 'https://fzozfojjmunoyoelnfnf.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6U7tpTnmfPXv1k1olDGUmA_iYTREI4t';
@@ -332,25 +331,43 @@ async function cargarDesdeSupabase() {
         mascotas = data || [];
         renderizarGaleria();
     } catch (error) {
-        console.error('Error al cargar de Supabase:', error.message);
+        console.error('Error detallado al cargar de Supabase:', error);
     }
 }
 
-// 2. MANEJO DE FOTO (FileReader a Base64 corregido con Bootstrap)
+// 2. MANEJO DE FOTO (FileReader a Base64 optimizado)
 inputFoto.addEventListener('change', function(evento){
     const archivo = evento.target.files[0];
     if (archivo) {
         const lector = new FileReader();
         lector.onload = function(e){
-            fotoBase64Temporal = e.target.result;
-            previewFoto.src = fotoBase64Temporal;
-            previewFoto.classList.remove('d-none'); // Muestra la imagen correctamente
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const MAX_WIDTH = 500;
+                let width = img.width;
+                let height = img.height;
+                if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                }
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                fotoBase64Temporal = canvas.toDataURL('image/jpeg', 0.7);
+                previewFoto.src = fotoBase64Temporal;
+                previewFoto.classList.remove('d-none');
+            };
         };
         lector.readAsDataURL(archivo);
     } else {
         fotoBase64Temporal = '';
         previewFoto.src = '';
-        previewFoto.classList.add('d-none'); // Oculta si se cancela
+        previewFoto.classList.add('d-none');
     }
 });
 
@@ -382,7 +399,11 @@ formMascota.addEventListener('submit', async function(evento){
             .insert([nuevaMascota])
             .select();
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error devuelto por Supabase:', error);
+            alert('Error de Supabase: ' + error.message);
+            return;
+        }
 
         await cargarDesdeSupabase();
         formMascota.reset();
@@ -391,8 +412,8 @@ formMascota.addEventListener('submit', async function(evento){
         fotoBase64Temporal = '';
         alert('¡Mascota registrada con éxito en la nube!');
     } catch (error) {
-        console.error('Error al registrar:', error.message);
-        alert('Error al guardar en la base de datos de Supabase.');
+        console.error('Error general al registrar:', error);
+        alert('Ocurrió un error inesperado al conectar con Supabase.');
     }
 });
 
@@ -482,7 +503,7 @@ async function alternarEstadoMascota(id){
         if (error) throw error;
         await cargarDesdeSupabase();
     } catch (error) {
-        console.error('Error al actualizar estado:', error.message);
+        console.error('Error al actualizar estado:', error);
     }
 }
 
@@ -528,7 +549,7 @@ btnEliminarModal.addEventListener('click', async function(){
         modalPerfil.hide();
         idMascotaActiva = null;
     } catch (error) {
-        console.error('Error al eliminar:', error.message);
+        console.error('Error al eliminar:', error);
         alert('No se pudo eliminar el registro de Supabase.');
     }
 });
