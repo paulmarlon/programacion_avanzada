@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Control y Adopción de Mascotas | Universidad Salesiana de Bolivia</title>
+
+<!-- Bootstrap 5 CSS vía CDN -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons vía CDN (para íconos de botones) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<style>
+    :root{
+        --usb-azul: #003399;
+        --usb-rojo: #D31111;
+        --usb-amarillo: #FFCC00;
+    }
+
+    body{
+        background-color:#f4f6fb;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+
+    /* ---------- Cabecera institucional ---------- */
+    .navbar-usb{
+        background: linear-gradient(90deg, var(--usb-azul) 0%, #001f66 100%);
+        border-bottom: 5px solid var(--usb-amarillo);
+    }
+
+    .navbar-usb .navbar-brand{
+        color:#fff;
+        font-weight:700;
+        letter-spacing:.5px;
+    }
+
+    .navbar-usb .subtitulo{
+        color: var(--usb-amarillo);
+        font-size:.8rem;
+        display:block;
+        font-weight:400;
+    }
+
+    .logo-usb{
+        width:55px;
+        height:55px;
+        margin-right:12px;
+        filter: drop-shadow(0 0 2px rgba(0,0,0,.4));
+    }
+
+    /* ---------- Botones institucionales ---------- */
+    .btn-usb-rojo{
+        background-color: var(--usb-rojo);
+        border-color: var(--usb-rojo);
+        color:#fff;
+    }
+    .btn-usb-rojo:hover{ background-color:#a80d0d; border-color:#a80d0d; color:#fff;}
+
+    .btn-usb-azul{
+        background-color: var(--usb-azul);
+        border-color: var(--usb-azul);
+        color:#fff;
+    }
+    .btn-usb-azul:hover{ background-color:#00246e; border-color:#00246e; color:#fff;}
+
+    .btn-usb-amarillo{
+        background-color: var(--usb-amarillo);
+        border-color: var(--usb-amarillo);
+        color:#1a1a1a;
+        font-weight:600;
+    }
+    .btn-usb-amarillo:hover{ background-color:#e6b800; border-color:#e6b800;}
+
+    /* ---------- Tarjetas de mascotas ---------- */
+    .card-mascota{
+        border: none;
+        border-radius: 14px;
+        overflow:hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,.08);
+        transition: transform .15s ease, box-shadow .15s ease;
+        height:100%;
+    }
+    .card-mascota:hover{
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0,0,0,.15);
+    }
+    .card-mascota .card-img-top{
+        height:220px;
+        object-fit:cover;
+        background-color:#e9ecef;
+    }
+    .card-mascota .card-header-especie{
+        position:absolute;
+        top:10px;
+        right:10px;
+    }
+
+    .badge-disponible{ background-color:#198754; }
+    .badge-adoptado{ background-color: var(--usb-rojo); }
+
+    .franja-titulo{
+        background-color: var(--usb-azul);
+        color:#fff;
+        border-left: 6px solid var(--usb-amarillo);
+        padding: .6rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.2rem;
+    }
+
+    /* ---------- Sección de formulario ---------- */
+    .panel-formulario{
+        background:#fff;
+        border-radius: 14px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,.06);
+        border-top: 5px solid var(--usb-rojo);
+    }
+
+    .preview-foto{
+        width:100%;
+        max-height:180px;
+        object-fit:cover;
+        border-radius:10px;
+        border:2px dashed #ccc;
+        display:none;
+    }
+
+    /* ---------- Modal perfil completo ---------- */
+    .modal-header-usb{
+        background-color: var(--usb-azul);
+        color:#fff;
+        border-bottom: 4px solid var(--usb-amarillo);
+    }
+    .foto-modal{
+        width:100%;
+        max-height:380px;
+        object-fit:cover;
+        border-radius:12px;
+        margin-bottom:1rem;
+    }
+
+    /* ---------- Footer institucional ---------- */
+    footer.footer-usb{
+        background-color: var(--usb-azul);
+        color:#fff;
+        border-top:5px solid var(--usb-amarillo);
+        padding: 1.2rem 0;
+        margin-top: 3rem;
+    }
+    footer.footer-usb strong{ color: var(--usb-amarillo); }
+
+    .empty-state{
+        text-align:center;
+        padding: 3rem 1rem;
+        color:#6c757d;
+    }
+</style>
+</head>
+<body>
+
+<!-- ======================= CABECERA INSTITUCIONAL ======================= -->
+<nav class="navbar navbar-usb navbar-dark py-3 mb-4">
+    <div class="container d-flex align-items-center">
+        <!-- Logo institucional (SVG en línea con los colores de la USB) -->
+        <svg class="logo-usb" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="48" fill="#003399" stroke="#FFCC00" stroke-width="4"/>
+            <path d="M50 20c-8 0-14 6-14 14 0 6 4 10 8 13-9 3-16 11-16 21h44c0-10-7-18-16-21 4-3 8-7 8-13 0-8-6-14-14-14z" fill="#FFCC00"/>
+            <text x="50" y="88" text-anchor="middle" font-size="14" fill="#D31111" font-weight="bold" font-family="Arial">USB</text>
+        </svg>
+        <div>
+            <span class="navbar-brand mb-0 h1">Sistema de Control y Adopción de Mascotas</span>
+            <span class="subtitulo">Universidad Salesiana de Bolivia — Facultad de Ingeniería | Programación Avanzada</span>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+
+    <!-- Botón de retorno al menú principal -->
+    <div class="mb-3">
+        <a href="../index.html" class="text-decoration-none text-primary fw-semibold d-inline-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left"></i> Volver al Menú Principal
+        </a>
+    </div>
+
+    <!-- ======================= MÓDULO DE REGISTRO ======================= -->
+    <div class="franja-titulo">
+        <h4 class="m-0"><i class="bi bi-clipboard2-plus"></i> Registro de Mascotas en Adopción</h4>
+    </div>
+
+    <div class="panel-formulario mb-5">
+        <form id="formMascota" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Nombre</label>
+                <input type="text" class="form-control" id="nombre" required placeholder="Ej. Firulais">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Especie</label>
+                <select class="form-select" id="especie" required>
+                    <option value="" selected disabled>Seleccione...</option>
+                    <option value="Perro">Perro</option>
+                    <option value="Gato">Gato</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Edad (años)</label>
+                <input type="number" min="0" step="1" class="form-control" id="edad" required placeholder="Ej. 2">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Raza</label>
+                <input type="text" class="form-control" id="raza" required placeholder="Ej. Criollo, Labrador, etc.">
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Estado de Salud / Vacunas</label>
+                <input type="text" class="form-control" id="salud" required placeholder="Ej. Vacunas al día, esterilizado">
+            </div>
+
+            <div class="col-md-8">
+                <label class="form-label fw-bold">Descripción / Historia</label>
+                <textarea class="form-control" id="descripcion" rows="3" required placeholder="Cuenta brevemente la historia de la mascota..."></textarea>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label fw-bold">Fotografía</label>
+                <input type="file" class="form-control" id="foto" accept="image/*">
+                <img id="previewFoto" class="preview-foto mt-2" alt="Vista previa de la foto">
+            </div>
+
+            <div class="col-12 text-end">
+                <button type="reset" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+                </button>
+                <button type="submit" class="btn btn-usb-rojo">
+                    <i class="bi bi-save"></i> Registrar Mascota
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ======================= GALERÍA DE ADOPCIÓN ======================= -->
+    <div class="franja-titulo d-flex justify-content-between align-items-center flex-wrap">
+        <h4 class="m-0"><i class="bi bi-images"></i> Galería de Adopción</h4>
+        <div class="mt-2 mt-md-0">
+            <select id="filtroEstado" class="form-select form-select-sm d-inline-block w-auto">
+                <option value="Todos">Todos los estados</option>
+                <option value="Disponible">Disponibles</option>
+                <option value="Adoptado">Adoptados</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="galeria" class="row g-4 mb-5">
+        <!-- Las tarjetas de mascotas se insertan aquí dinámicamente mediante JavaScript -->
+    </div>
+
+</div>
+
+<!-- ======================= MODAL DE PERFIL COMPLETO ======================= -->
+<div class="modal fade" id="modalPerfil" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header modal-header-usb">
+                <h5 class="modal-title"><i class="bi bi-file-earmark-person"></i> Ficha Completa de la Mascota</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido dinámico del perfil de la mascota -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" id="btnEliminarModal">
+                    <i class="bi bi-trash"></i> Eliminar registro
+                </button>
+                <button type="button" class="btn btn-usb-azul" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= FOOTER INSTITUCIONAL ======================= -->
+<footer class="footer-usb text-center">
+    <div class="container">
+        <p class="mb-1">Universidad Salesiana de Bolivia — Materia: Programación Avanzada</p>
+        <p class="mb-0">Desarrollado por: <strong>Ing. MACRO</strong> (Ingeniero Miguel Angel Cruz Ramos)</p>
+    </div>
+</footer>
+
+<!-- Bootstrap 5 JS Bundle (incluye Popper) vía CDN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const CLAVE_STORAGE = 'mascotasUSB';
+let mascotas = cargarDesdeStorage();
+
+const galeria = document.getElementById('galeria');
+const formMascota = document.getElementById('formMascota');
+const inputFoto = document.getElementById('foto');
+const previewFoto = document.getElementById('previewFoto');
+const filtroEstado = document.getElementById('filtroEstado');
+const modalPerfilEl = document.getElementById('modalPerfil');
+const modalPerfil = new bootstrap.Modal(modalPerfilEl);
+const modalBody = document.getElementById('modalBody');
+const btnEliminarModal = document.getElementById('btnEliminarModal');
+
+let idMascotaActiva = null;
+let fotoBase64Temporal = '';
+
+function cargarDesdeStorage(){
+    const datos = localStorage.getItem(CLAVE_STORAGE);
+    return datos ? JSON.parse(datos) : [];
+}
+
+function guardarEnStorage(){
+    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(mascotas));
+}
+
+inputFoto.addEventListener('change', function(evento){
+    const archivo = evento.target.files[0];
+    if(!archivo){
+        fotoBase64Temporal = '';
+        previewFoto.style.display = 'none';
+        return;
+    }
+    const lector = new FileReader();
+    lector.onload = function(eventoLectura){
+        fotoBase64Temporal = eventoLectura.target.result;
+        previewFoto.src = fotoBase64Temporal;
+        previewFoto.style.display = 'block';
+    };
+    lector.readAsDataURL(archivo);
+});
+
+formMascota.addEventListener('submit', function(evento){
+    evento.preventDefault();
+    const nuevaMascota = {
+        id: Date.now(),
+        nombre: document.getElementById('nombre').value.trim(),
+        especie: document.getElementById('especie').value,
+        edad: document.getElementById('edad').value,
+        raza: document.getElementById('raza').value.trim(),
+        salud: document.getElementById('salud').value.trim(),
+        descripcion: document.getElementById('descripcion').value.trim(),
+        foto: fotoBase64Temporal || generarFotoPlaceholder(),
+        estado: 'Disponible'
+    };
+    mascotas.push(nuevaMascota);
+    guardarEnStorage();
+    renderizarGaleria();
+    formMascota.reset();
+    previewFoto.style.display = 'none';
+    fotoBase64Temporal = '';
+});
+
+function generarFotoPlaceholder(){
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220">
+        <rect width="100%" height="100%" fill="#e9ecef"/>
+        <text x="50%" y="50%" font-size="16" fill="#6c757d" text-anchor="middle" dy=".3em" font-family="Arial">Sin fotografía</text>
+    </svg>`;
+    return 'data:image/svg+xml;base64,' + btoa(svg);
+}
+
+function renderizarGaleria(){
+    const filtro = filtroEstado.value;
+    const listaFiltrada = mascotas.filter(m => filtro === 'Todos' || m.estado === filtro);
+    galeria.innerHTML = '';
+
+    if(listaFiltrada.length === 0){
+        galeria.innerHTML = `
+            <div class="col-12">
+                <div class="empty-state">
+                    <i class="bi bi-emoji-frown" style="font-size:2.5rem;"></i>
+                    <p class="mt-2">No hay mascotas registradas para este filtro todavía.</p>
+                </div>
+            </div>`;
+        return;
+    }
+
+    listaFiltrada.forEach(mascota => {
+        const esDisponible = mascota.estado === 'Disponible';
+        const claseBadge = esDisponible ? 'badge-disponible' : 'badge-adoptado';
+        const textoBtnEstado = esDisponible
+            ? '<i class="bi bi-heart-fill"></i> Marcar Adoptado'
+            : '<i class="bi bi-arrow-counterclockwise"></i> Marcar Disponible';
+        const claseBtnEstado = esDisponible ? 'btn-usb-rojo' : 'btn-usb-azul';
+
+        const columna = document.createElement('div');
+        columna.className = 'col-sm-6 col-lg-4';
+        columna.innerHTML = `
+            <div class="card card-mascota position-relative">
+                <span class="badge ${claseBadge} card-header-especie">${mascota.estado}</span>
+                <img src="${mascota.foto}" class="card-img-top" alt="Foto de ${mascota.nombre}">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title mb-1">${mascota.nombre}</h5>
+                    <p class="card-text text-muted mb-2">
+                        <i class="bi bi-tag-fill"></i> ${mascota.especie} &nbsp;|&nbsp;
+                        <i class="bi bi-calendar3"></i> ${mascota.edad} años
+                    </p>
+                    <div class="mt-auto d-grid gap-2">
+                        <button class="btn btn-usb-amarillo btn-sm btn-ver-perfil" data-id="${mascota.id}">
+                            <i class="bi bi-person-badge"></i> Ver Perfil Completo
+                        </button>
+                        <button class="btn ${claseBtnEstado} btn-sm btn-toggle-estado" data-id="${mascota.id}">
+                            ${textoBtnEstado}
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        galeria.appendChild(columna);
+    });
+
+    enlazarEventosDeTarjetas();
+}
+
+function enlazarEventosDeTarjetas(){
+    document.querySelectorAll('.btn-ver-perfil').forEach(boton => {
+        boton.addEventListener('click', () => abrirPerfilCompleto(Number(boton.dataset.id)));
+    });
+    document.querySelectorAll('.btn-toggle-estado').forEach(boton => {
+        boton.addEventListener('click', () => alternarEstadoMascota(Number(boton.dataset.id)));
+    });
+}
+
+function alternarEstadoMascota(id){
+    const mascota = mascotas.find(m => m.id === id);
+    if(!mascota) return;
+    mascota.estado = mascota.estado === 'Disponible' ? 'Adoptado' : 'Disponible';
+    guardarEnStorage();
+    renderizarGaleria();
+}
+
+function abrirPerfilCompleto(id){
+    const mascota = mascotas.find(m => m.id === id);
+    if(!mascota) return;
+    idMascotaActiva = id;
+    const claseBadge = mascota.estado === 'Disponible' ? 'badge-disponible' : 'badge-adoptado';
+    modalBody.innerHTML = `
+        <img src="${mascota.foto}" class="foto-modal" alt="Foto completa de ${mascota.nombre}">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="mb-0">${mascota.nombre}</h3>
+            <span class="badge ${claseBadge} fs-6">${mascota.estado}</span>
+        </div>
+        <table class="table table-bordered">
+            <tbody>
+                <tr><th style="width:35%">Especie</th><td>${mascota.especie}</td></tr>
+                <tr><th>Raza</th><td>${mascota.raza}</td></tr>
+                <tr><th>Edad</th><td>${mascota.edad} años</td></tr>
+                <tr><th>Ficha médica / Vacunas</th><td>${mascota.salud}</td></tr>
+                <tr><th>Historia</th><td>${mascota.descripcion}</td></tr>
+            </tbody>
+        </table>
+    `;
+    modalPerfil.show();
+}
+
+btnEliminarModal.addEventListener('click', function(){
+    if(idMascotaActiva === null) return;
+    const confirmar = confirm('¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.');
+    if(!confirmar) return;
+    mascotas = mascotas.filter(m => m.id !== idMascotaActiva);
+    guardarEnStorage();
+    renderizarGaleria();
+    modalPerfil.hide();
+    idMascotaActiva = null;
+});
+
+filtroEstado.addEventListener('change', renderizarGaleria);
+renderizarGaleria();
+</script>
+
+</body>
+</html>
