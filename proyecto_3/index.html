@@ -9,6 +9,8 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <!-- Bootstrap Icons vía CDN (para íconos de botones) -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<!-- Supabase JS Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
     :root{
@@ -185,7 +187,7 @@
 
     <!-- ======================= MÓDULO DE REGISTRO ======================= -->
     <div class="franja-titulo">
-        <h4 class="m-0"><i class="bi bi-clipboard2-plus"></i> Registro de Mascotas en Adopción</h4>
+        <h4 class="m-0"><i class="bi bi-clipboard2-plus"></i> Registro de Mascotas en Adopción (Supabase Cloud)</h4>
     </div>
 
     <div class="panel-formulario mb-5">
@@ -236,7 +238,7 @@
                     <i class="bi bi-arrow-counterclockwise"></i> Limpiar
                 </button>
                 <button type="submit" class="btn btn-usb-rojo">
-                    <i class="bi bi-save"></i> Registrar Mascota
+                    <i class="bi bi-save"></i> Registrar en la Nube
                 </button>
             </div>
         </form>
@@ -293,8 +295,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-const CLAVE_STORAGE = 'mascotasUSB';
-let mascotas = cargarDesdeStorage();
+// =========================================================================
+// CONFIGURACIÓN DE SUPABASE (REEMPLAZA CON TUS CREDENCIALES REALES)
+// =========================================================================
+const SUPABASE_URL = 'https://fzozfojjmunoyoelnfnf.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_6U7tpTnmfPXv1k1olDGUmA_iYTREI4t';
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let mascotas = []; // Arreglo sincronizado con Supabase
 
 const galeria = document.getElementById('galeria');
 const formMascota = document.getElementById('formMascota');
@@ -309,15 +318,24 @@ const btnEliminarModal = document.getElementById('btnEliminarModal');
 let idMascotaActiva = null;
 let fotoBase64Temporal = '';
 
-function cargarDesdeStorage(){
-    const datos = localStorage.getItem(CLAVE_STORAGE);
-    return datos ? JSON.parse(datos) : [];
+// 1. CARGAR DATOS DESDE SUPABASE (SELECT)
+async function cargarDesdeSupabase() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('mascotas_usb')
+            .select('*')
+            .order('id', { ascending: false });
+
+        if (error) throw error;
+        mascotas = data || [];
+        renderizarGaleria();
+    } catch (error) {
+        console.error('Error al cargar de Supabase:', error.message);
+        alert('No se pudieron sincronizar las mascotas desde la nube.');
+    }
 }
 
-function guardarEnStorage(){
-    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(mascotas));
-}
-
+// 2. MANEJO DE FOTO (FileReader a Base64)
 inputFoto.addEventListener('change', function(evento){
     const archivo = evento.target.files[0];
     if(!archivo){
@@ -334,25 +352,37 @@ inputFoto.addEventListener('change', function(evento){
     lector.readAsDataURL(archivo);
 });
 
-formMascota.addEventListener('submit', function(evento){
+// 3. REGISTRAR NUEVA MASCOTA EN SUPABASE (INSERT)
+formMascota.addEventListener('submit', async function(evento){
     evento.preventDefault();
+
     const nuevaMascota = {
-        id: Date.now(),
         nombre: document.getElementById('nombre').value.trim(),
         especie: document.getElementById('especie').value,
-        edad: document.getElementById('edad').value,
+        edad: parseInt(document.getElementById('edad').value),
         raza: document.getElementById('raza').value.trim(),
         salud: document.getElementById('salud').value.trim(),
         descripcion: document.getElementById('descripcion').value.trim(),
         foto: fotoBase64Temporal || generarFotoPlaceholder(),
         estado: 'Disponible'
     };
-    mascotas.push(nuevaMascota);
-    guardarEnStorage();
-    renderizarGaleria();
-    formMascota.reset();
-    previewFoto.style.display = 'none';
-    fotoBase64Temporal = '';
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('mascotas_usb')
+            .insert([nuevaMascota])
+            .select();
+
+        if (error) throw error;
+
+        await cargarDesdeSupabase();
+        formMascota.reset();
+        previewFoto.style.display = 'none';
+        fotoBase64Temporal = '';
+    } catch (error) {
+        console.error('Error al registrar:', error.message);
+        alert('Error al guardar en la base de datos de Supabase.');
+    }
 });
 
 function generarFotoPlaceholder(){
@@ -363,6 +393,7 @@ function generarFotoPlaceholder(){
     return 'data:image/svg+xml;base64,' + btoa(svg);
 }
 
+// 4. RENDERIZAR GALERÍA
 function renderizarGaleria(){
     const filtro = filtroEstado.value;
     const listaFiltrada = mascotas.filter(m => filtro === 'Todos' || m.estado === filtro);
@@ -373,7 +404,7 @@ function renderizarGaleria(){
             <div class="col-12">
                 <div class="empty-state">
                     <i class="bi bi-emoji-frown" style="font-size:2.5rem;"></i>
-                    <p class="mt-2">No hay mascotas registradas para este filtro todavía.</p>
+                    <p class="mt-2">No hay mascotas registradas en la nube para este filtro.</p>
                 </div>
             </div>`;
         return;
@@ -424,14 +455,27 @@ function enlazarEventosDeTarjetas(){
     });
 }
 
-function alternarEstadoMascota(id){
+// 5. ALTERNAR ESTADO EN SUPABASE (UPDATE)
+async function alternarEstadoMascota(id){
     const mascota = mascotas.find(m => m.id === id);
     if(!mascota) return;
-    mascota.estado = mascota.estado === 'Disponible' ? 'Adoptado' : 'Disponible';
-    guardarEnStorage();
-    renderizarGaleria();
+
+    const nuevoEstado = mascota.estado === 'Disponible' ? 'Adoptado' : 'Disponible';
+
+    try {
+        const { error } = await supabaseClient
+            .from('mascotas_usb')
+            .update({ estado: nuevoEstado })
+            .eq('id', id);
+
+        if (error) throw error;
+        await cargarDesdeSupabase();
+    } catch (error) {
+        console.error('Error al actualizar estado:', error.message);
+    }
 }
 
+// 6. MODAL Y ELIMINACIÓN EN SUPABASE (DELETE)
 function abrirPerfilCompleto(id){
     const mascota = mascotas.find(m => m.id === id);
     if(!mascota) return;
@@ -456,19 +500,32 @@ function abrirPerfilCompleto(id){
     modalPerfil.show();
 }
 
-btnEliminarModal.addEventListener('click', function(){
+btnEliminarModal.addEventListener('click', async function(){
     if(idMascotaActiva === null) return;
-    const confirmar = confirm('¿Está seguro de eliminar este registro? Esta acción no se puede deshacer.');
+    const confirmar = confirm('¿Está seguro de eliminar este registro de la base de datos? Esta acción no se puede deshacer.');
     if(!confirmar) return;
-    mascotas = mascotas.filter(m => m.id !== idMascotaActiva);
-    guardarEnStorage();
-    renderizarGaleria();
-    modalPerfil.hide();
-    idMascotaActiva = null;
+
+    try {
+        const { error } = await supabaseClient
+            .from('mascotas_usb')
+            .delete()
+            .eq('id', idMascotaActiva);
+
+        if (error) throw error;
+
+        await cargarDesdeSupabase();
+        modalPerfil.hide();
+        idMascotaActiva = null;
+    } catch (error) {
+        console.error('Error al eliminar:', error.message);
+        alert('No se pudo eliminar el registro de Supabase.');
+    }
 });
 
 filtroEstado.addEventListener('change', renderizarGaleria);
-renderizarGaleria();
+
+// Inicialización: cargamos los datos reales desde Supabase al iniciar
+cargarDesdeSupabase();
 </script>
 
 </body>
