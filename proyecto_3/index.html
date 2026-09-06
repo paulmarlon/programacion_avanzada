@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -110,7 +109,7 @@
         margin-bottom: 1.2rem;
     }
 
-    /* ---------- Sección de formulario ---------- */
+    /* ---------- Sección de formulario y previsualización de foto ---------- */
     .panel-formulario{
         background:#fff;
         border-radius: 14px;
@@ -120,11 +119,13 @@
     }
 
     .preview-foto{
-        width:100%;
-        max-height:180px;
-        object-fit:cover;
-        border-radius:10px;
-        border:2px dashed #ccc;
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 2px dashed var(--usb-azul);
+        background-color: #f8f9fa;
+        margin-top: 0.5rem;
     }
 
     /* ---------- Modal perfil completo ---------- */
@@ -229,8 +230,8 @@
             <div class="col-md-4">
                 <label class="form-label fw-bold">Fotografía</label>
                 <input type="file" class="form-control" id="foto" accept="image/*">
-                <!-- Se agregó 'd-none' para controlar la visibilidad con Bootstrap de forma limpia -->
-                <img id="previewFoto" class="preview-foto mt-2 d-none" alt="Vista previa de la foto">
+                <!-- Vista previa estilizada y limpia con la clase preview-foto -->
+                <img id="previewFoto" class="preview-foto d-none" alt="Vista previa de la foto">
             </div>
 
             <div class="col-12 text-end">
@@ -296,10 +297,10 @@
 
 <script>
 // =========================================================================
-// CONFIGURACIÓN DE SUPABASE (REEMPLAZA CON TUS CREDENCIALES REALES)
+// CONFIGURACIÓN DE SUPABASE
 // =========================================================================
 const SUPABASE_URL = 'https://fzozfojjmunoyoelnfnf.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_6U7tpTnmfPXv1k1olDGUmA_iYTREI4t';
+const SUPABASE_KEY = 'sb_publishable_6U7tpTnmfPXv1k1olDGUmA_iYTREI4t';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -335,7 +336,7 @@ async function cargarDesdeSupabase() {
     }
 }
 
-// 2. MANEJO DE FOTO (FileReader a Base64 optimizado)
+// 2. MANEJO DE FOTO (FileReader a Base64 optimizado y previsualización estilizada)
 inputFoto.addEventListener('change', function(evento){
     const archivo = evento.target.files[0];
     if (archivo) {
@@ -359,6 +360,8 @@ inputFoto.addEventListener('change', function(evento){
                 ctx.drawImage(img, 0, 0, width, height);
                 
                 fotoBase64Temporal = canvas.toDataURL('image/jpeg', 0.7);
+                
+                // Asignar y mostrar la vista previa nítida
                 previewFoto.src = fotoBase64Temporal;
                 previewFoto.classList.remove('d-none');
             };
@@ -371,7 +374,7 @@ inputFoto.addEventListener('change', function(evento){
     }
 });
 
-// Limpiar vista previa al hacer reset
+// Limpiar vista previa al hacer reset o clic en limpiar
 btnLimpiar.addEventListener('click', function(){
     fotoBase64Temporal = '';
     previewFoto.src = '';
