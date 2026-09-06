@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Laboratorio de Programación Avanzada — Portafolio</title>
+
+    <!-- Tailwind CSS vía CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        body { -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center justify-center p-4">
+
+    <div class="max-w-4xl w-full bg-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 border border-slate-700">
+        
+        <!-- Encabezado -->
+        <div class="text-center mb-8">
+            <span class="bg-indigo-900 text-indigo-300 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">
+                Laboratorio Universitario
+            </span>
+            <h1 class="text-2xl sm:text-4xl font-bold mt-3 text-white tracking-tight">
+                Portafolio de Sistemas
+            </h1>
+            <p class="text-slate-400 text-sm mt-2">
+                Panel central de acceso a los proyectos desarrollados en la materia.
+            </p>
+        </div>
+
+        <!-- Cuadrícula de Proyectos -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Proyecto 1 -->
+            <div class="bg-slate-700/50 border border-slate-600 rounded-xl p-5 flex flex-col justify-between hover:border-indigo-500 transition">
+                <div>
+                    <div class="text-indigo-400 text-xs font-bold uppercase mb-1">Módulo 01</div>
+                    <h2 class="text-lg font-semibold text-white mb-2">Registro de Estudiantes</h2>
+                    <p class="text-slate-300 text-xs mb-4">
+                        Sistema CRUD conectado a la nube con Supabase y PostgreSQL.
+                    </p>
+                </div>
+                <a href="proyecto_1/index.html" 
+                   class="inline-block text-center bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium py-2.5 px-4 rounded-lg transition shadow">
+                    Abrir Sistema →
+                </a>
+            </div>
+
+            <!-- Proyecto 2 (Próximamente) -->
+            <div class="bg-slate-700/30 border border-slate-700 rounded-xl p-5 flex flex-col justify-between opacity-60">
+                <div>
+                    <div class="text-slate-400 text-xs font-bold uppercase mb-1">Módulo 02</div>
+                    <h2 class="text-lg font-semibold text-white mb-2">Próximo Proyecto</h2>
+                    <p class="text-slate-400 text-xs mb-4">
+                        Espacio reservado para el siguiente laboratorio o módulo.
+                    </p>
+                </div>
+                <span class="text-center bg-slate-800 text-slate-500 text-xs font-medium py-2.5 px-4 rounded-lg cursor-not-allowed">
+                    Pronto
+                </span>
+            </div>
+
+            <!-- Proyecto 3 (Próximamente) -->
+            <div class="bg-slate-700/30 border border-slate-700 rounded-xl p-5 flex flex-col justify-between opacity-60">
+                <div>
+                    <div class="text-slate-400 text-xs font-bold uppercase mb-1">Módulo 03</div>
+                    <h2 class="text-lg font-semibold text-white mb-2">Próximo Proyecto</h2>
+                    <p class="text-slate-400 text-xs mb-4">
+                        Espacio reservado para el tercer módulo del curso.
+                    </p>
+                </div>
+                <span class="text-center bg-slate-800 text-slate-500 text-xs font-medium py-2.5 px-4 rounded-lg cursor-not-allowed">
+                    Pronto
+                </span>
+            </div>
+
+        </div>
+
+        <!-- Pie de página interno -->
+        <div class="mt-8 pt-4 border-t border-slate-700 text-center text-xs text-slate-500">
+            Sincronizado con GitHub Pages &bull; Programación Avanzada
+        </div>
+
+    </div>
+
+</body>
+</html>
