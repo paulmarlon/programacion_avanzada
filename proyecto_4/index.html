@@ -1,24 +1,72 @@
-// Endpoint de la Web App desplegada en Google Apps Script
-const URL_GAS_API = "https://script.google.com/macros/s/AKfycbzRhkQLupSyJiuu3Gq1of3oMbj8Fxwmx_53qJzj2dp8IuGXW9sdQZJ0FRh4NyH_d-4O/exec";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro en PostgreSQL vía GAS</title>
+    <!-- Tailwind CSS para mantener el diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-4">
 
-async function enviarDatosFormulario() {
-  const payload = {
-    nombre: document.getElementById("txtNombre").value,
-    categoria: document.getElementById("txtCategoria").value,
-    detalle: document.getElementById("txtDetalle").value
-  };
+    <div class="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-700">
+        <h1 class="text-xl font-bold text-white mb-4">Nuevo Registro (Base de Datos)</h1>
+        
+        <!-- Formulario con los IDs que busca el script -->
+        <form id="miFormulario" class="space-y-4" onsubmit="event.preventDefault(); enviarDatosFormulario();">
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Nombre / Título:</label>
+                <input type="text" id="txtNombre" required class="w-full p-2.5 bg-slate-900 border border-slate-600 rounded-lg text-white focus:border-indigo-500 outline-none">
+            </div>
 
-  try {
-    // Petición asíncrona mediante fetch() en modo no-cors
-    await fetch(URL_GAS_API, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Categoría:</label>
+                <input type="text" id="txtCategoria" required class="w-full p-2.5 bg-slate-900 border border-slate-600 rounded-lg text-white focus:border-indigo-500 outline-none">
+            </div>
 
-    alert("Registro exitoso: Datos enviados a PostgreSQL vía GAS.");
-  } catch (error) {
-    console.error("Error al conectar con la API:", error);
-  }
-}
+            <div>
+                <label class="block text-xs font-semibold text-slate-400 mb-1">Detalle / Descripción:</label>
+                <textarea id="txtDetalle" rows="3" required class="w-full p-2.5 bg-slate-900 border border-slate-600 rounded-lg text-white focus:border-indigo-500 outline-none"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition shadow">
+                Guardar en la Nube
+            </button>
+        </form>
+
+        <div class="mt-4 text-center">
+            <a href="../index.html" class="text-xs text-indigo-400 hover:underline">← Volver al Portafolio</a>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE CONEXIÓN QUE TE DIERON -->
+    <script>
+        // REEMPLAZA ESTA URL CON TU URL REAL DE GOOGLE APPS SCRIPT QUE TERMINA EN /exec
+        const URL_GAS_API = "https://script.google.com/macros/s/TU_SCRIPT_ID/exec";
+
+        async function enviarDatosFormulario() {
+            const payload = {
+                nombre: document.getElementById("txtNombre").value,
+                categoria: document.getElementById("txtCategoria").value,
+                detalle: document.getElementById("txtDetalle").value
+            };
+
+            try {
+                // Petición asíncrona mediante fetch() en modo no-cors
+                await fetch(URL_GAS_API, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                alert("Registro exitoso: Datos enviados a PostgreSQL vía GAS.");
+                document.getElementById("miFormulario").reset(); // Limpia el formulario
+            } catch (error) {
+                console.error("Error al conectar con la API:", error);
+                alert("Hubo un error al enviar los datos.");
+            }
+        }
+    </script>
+</body>
+</html>
