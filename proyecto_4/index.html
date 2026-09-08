@@ -1,0 +1,24 @@
+// Endpoint de la Web App desplegada en Google Apps Script
+const URL_GAS_API = "https://script.google.com/macros/s/AKfycbzRhkQLupSyJiuu3Gq1of3oMbj8Fxwmx_53qJzj2dp8IuGXW9sdQZJ0FRh4NyH_d-4O/exec";
+
+async function enviarDatosFormulario() {
+  const payload = {
+    nombre: document.getElementById("txtNombre").value,
+    categoria: document.getElementById("txtCategoria").value,
+    detalle: document.getElementById("txtDetalle").value
+  };
+
+  try {
+    // Petición asíncrona mediante fetch() en modo no-cors
+    await fetch(URL_GAS_API, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    alert("Registro exitoso: Datos enviados a PostgreSQL vía GAS.");
+  } catch (error) {
+    console.error("Error al conectar con la API:", error);
+  }
+}
