@@ -29,7 +29,7 @@
                 <textarea id="txtDetalle" rows="3" required class="w-full p-2.5 bg-slate-900 border border-slate-600 rounded-lg text-white focus:border-indigo-500 outline-none"></textarea>
             </div>
 
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition shadow">
+            <button type="submit" id="btnGuardar" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition shadow">
                 Guardar en la Nube
             </button>
         </form>
@@ -39,12 +39,14 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE CONEXIÓN QUE TE DIERON -->
+    <!-- SCRIPT DE CONEXIÓN CORREGIDO -->
     <script>
-        // REEMPLAZA ESTA URL CON TU URL REAL DE GOOGLE APPS SCRIPT QUE TERMINA EN /exec
+        // PEGA AQUÍ TU URL REAL DE GOOGLE APPS SCRIPT QUE TERMINA EN /exec
         const URL_GAS_API = "https://script.google.com/macros/s/TU_SCRIPT_ID/exec";
 
         async function enviarDatosFormulario() {
+            const btnGuardar = document.getElementById("btnGuardar");
+            
             const payload = {
                 nombre: document.getElementById("txtNombre").value,
                 categoria: document.getElementById("txtCategoria").value,
@@ -52,19 +54,33 @@
             };
 
             try {
-                // Petición asíncrona mediante fetch() en modo no-cors
-                await fetch(URL_GAS_API, {
+                btnGuardar.disabled = true;
+                btnGuardar.textContent = "Guardando...";
+
+                // Petición estándar (sin no-cors para permitir traspaso de JSON y lectura de respuesta)
+                const respuesta = await fetch(URL_GAS_API, {
                     method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { 
+                        "Content-Type": "text/plain;charset=utf-8" // Usar text/plain previene pre-flight issues de CORS en Google Apps Script
+                    },
                     body: JSON.stringify(payload)
                 });
 
-                alert("Registro exitoso: Datos enviados a PostgreSQL vía GAS.");
-                document.getElementById("miFormulario").reset(); // Limpia el formulario
+                const resultado = await respuesta.json();
+
+                if (resultado.status === "SUCCESS") {
+                    alert("¡Éxito! " + resultado.mensaje);
+                    document.getElementById("miFormulario").reset();
+                } else {
+                    alert("Error devuelto por el servidor: " + resultado.message);
+                }
+
             } catch (error) {
                 console.error("Error al conectar con la API:", error);
-                alert("Hubo un error al enviar los datos.");
+                alert("Hubo un error de conexión con el servidor GAS.");
+            } finally {
+                btnGuardar.disabled = false;
+                btnGuardar.textContent = "Guardar en la Nube";
             }
         }
     </script>
