@@ -1,0 +1,40 @@
+Table users {
+    id integer [primary key]
+    username varchar [unique, not null]
+    email varchar [unique, not null]
+    created_at timestamp
+}
+
+Table posts {
+    id integer [primary key]
+    user_id integer [not null]
+    content text [not null]
+    created_at timestamp
+}
+
+Table follows {
+    follower_id integer [not null]
+    following_id integer [not null]
+
+    indexes {
+        (follower_id, following_id) [pk]
+    }
+
+}
+
+Table likes {
+    user_id integer [not null]
+    post_id integer [not null]
+
+    indexes {
+        (user_id, post_id) [pk]
+    }
+
+}
+
+// Relaciones (Foreign Keys)
+Ref: posts.user_id > users.id // Un usuario crea muchas publicaciones
+Ref: follows.follower_id > users.id // Quién sigue
+Ref: follows.following_id > users.id // A quién siguen
+Ref: likes.user_id > users.id // Quién dio like
+Ref: likes.post_id > posts.id // A qué publicación dio like

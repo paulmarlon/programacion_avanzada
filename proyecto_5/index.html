@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Programación Avanzada - Ing. MACRO</title>
+  
+  <!-- Estilos de Reveal.js para Diapositivas -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/white.min.css">
+  <!-- Highlight.js para código -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/monokai-sublime.min.css">
+
+  <style>
+    :root {
+      --usb-azul: #003399;
+      --usb-rojo: #D31111;
+      --usb-amarillo: #FFCC00;
+    }
+    .reveal { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .reveal h1, .reveal h2, .reveal h3 { color: var(--usb-azul); font-weight: 700; text-transform: none; }
+    .reveal .badge-macro { background-color: var(--usb-rojo); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.6em; }
+    .reveal .badge-tema { background-color: var(--usb-azul); color: white; padding: 3px 10px; border-radius: 10px; font-size: 0.5em; }
+    .reveal .card-box { background: #f8f9fa; border-left: 6px solid var(--usb-azul); padding: 15px; border-radius: 5px; text-align: left; font-size: 0.75em; margin-bottom: 15px; }
+    .reveal .card-analogia { background: #fffde7; border-left: 6px solid var(--usb-amarillo); padding: 15px; border-radius: 5px; text-align: left; font-size: 0.75em; margin-bottom: 15px; }
+    .reveal pre code { border-radius: 8px; font-size: 0.7em; line-height: 1.3; }
+    .reveal table { font-size: 0.65em; margin: 15px auto; width: 100%; }
+    .reveal th { background-color: var(--usb-azul); color: white; }
+    .footer-usb { position: absolute; bottom: 10px; left: 10px; font-size: 0.4em; color: #666; }
+  </style>
+</head>
+<body>
+
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- PORTADA GENERAL -->
+      <section>
+        <span class="badge-macro">Ing. MACRO</span>
+        <h3>UNIVERSIDAD SALESIANA DE BOLIVIA</h3>
+        <p style="color: var(--usb-rojo); font-weight: bold; font-size: 0.9em;">Programación Avanzada (ING-321) - Paralelo 131</p>
+        <hr style="border-color: var(--usb-amarillo); border-width: 2px;">
+        <h2>Compendio Teórico-Práctico de Estructuras y Eficiencia</h2>
+        <p style="font-size: 0.7em; color: #555;">Guía de estudio para la nivelación y desarrollo disciplinar</p>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TEMA 1: GESTIÓN DE MEMORIA DINÁMICA -->
+      <!-- ========================================== -->
+      <section>
+        <section>
+          <span class="badge-tema">TEMA 1</span>
+          <h2>1. Gestión de Memoria Dinámica</h2>
+          <p style="font-size: 0.7em;">Administración del Stack vs. Heap: <code>nullptr</code>, <code>delete</code> y <code>delete[]</code></p>
+        </section>
+
+        <section>
+          <h3>1.1 La Analogía del Casillero Universitario</h3>
+          <div class="card-analogia">
+            <strong>🏫 Memoria Estática (Stack):</strong> Es como un pupitre asignado el primer día. Ya tiene dueño, tamaño fijo y se libera solo cuando termina la clase.<br><br>
+            <strong>🏢 Memoria Dinámica (Heap):</strong> Es como alquilar un casillero (locker) en recepción. Lo solicitas en tiempo de ejecución (<code>new</code>), usas el espacio exacto que necesitas y <strong>tienes la obligación de devolver la llave (<code>delete</code>)</strong>. Si no la devuelves, nadie más podrá usar ese casillero (Fuga de memoria / <em>Memory Leak</em>).
+          </div>
+        </section>
+
+        <section>
+          <h3>1.2 Operadores Clave en C++</h3>
+          <div class="card-box">
+            <ul>
+              <li><code>nullptr</code>: Puntero nulo seguro. Indica explícitamente que el puntero no apunta a ninguna dirección de memoria válida ("casillero desocupado").</li>
+              <li><code>delete ptr;</code>: Libera un objeto individual solicitado previamente con <code>new</code>.</li>
+              <li><code>delete[] arr;</code>: Libera un bloque completo de memoria contigua (arreglo) reservado con <code>new T[N]</code>.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section>
+          <h3>1.3 Código Fuente: Asignación y Libere</h3>
+          <pre><code class="language-cpp">// Reserva dinámica de memoria
+int* notaEstudiante = new int; 
+*notaEstudiante = 100;
+
+// Liberación correcta
+delete notaEstudiante; 
+notaEstudiante = nullptr; // Evita punteros colgantes (Dangling Pointers)
+
+// Reserva de arreglo dinámico de estudiantes
+int totalEstudiantes = 45;
+int* listaNotas = new int[totalEstudiantes];
+
+// Liberación de arreglo dinámico
+delete[] listaNotas; 
+listaNotas = nullptr;</code></pre>
+        </section>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TEMA 2: PARADIGMAS Y TRAZABILIDAD DE EFICIENCIA -->
+      <!-- ========================================== -->
+      <section>
+        <section>
+          <span class="badge-tema">TEMA 2</span>
+          <h2>2. Paradigmas y Trazabilidad en Eficiencia</h2>
+          <p style="font-size: 0.7em;">Definición de Eficiencia: Velocidad, Precisión y Esfuerzo Adecuado</p>
+        </section>
+
+        <section>
+          <h3>2.1 Los 3 Pilares de la Eficiencia (Ing. MACRO)</h3>
+          <div class="card-box">
+            <ul>
+              <li><strong>⚡ Velocidad:</strong> Tiempo de ejecución reducido al procesar grandes volúmenes de datos (ej. consultar 300+ registros).</li>
+              <li><strong>🎯 Precisión:</strong> Exactitud algorítmica sin margen de error lógico ni inconsistencia de datos.</li>
+              <li><strong>💪 Esfuerzo Adecuado:</strong> Uso óptimo de hardware (CPU y RAM) sin desperdiciar recursos del sistema.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section>
+          <h3>2.2 Analogía: La Fila de la Fotocopiadora</h3>
+          <div class="card-analogia">
+            Si 100 estudiantes necesitan sacar fotocopia de la misma práctica:<br>
+            ❌ <strong>Ineficiente:</strong> Que cada uno haga la fila individualmente para sacar 1 copia.<br>
+            ✔️ <strong>Eficiente (Velocidad, Precisión y Esfuerzo):</strong> Un delegado saca 100 fotocopias juntas en un solo pedido y las distribuye en el aula. Mismo resultado, 99% menos de esfuerzo y tiempo.
+          </div>
+        </section>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TEMA 3: COMPLEJIDAD Y NOTACIÓN ASINTÓTICA -->
+      <!-- ========================================== -->
+      <section>
+        <section>
+          <span class="badge-tema">TEMA 3</span>
+          <h2>3. Complejidad de Algoritmos</h2>
+          <p style="font-size: 0.7em;">Notación Asintótica: Big-O ($O$), Omega ($\Omega$) y Theta ($\Theta$)</p>
+        </section>
+
+        <section>
+          <h3>3.1 La Notación Big-O ($O$)</h3>
+          <div class="card-box">
+            Mide el <strong>peor escenario posible</strong> del comportamiento de un algoritmo a medida que el número de datos ($N$) tiende al infinito.
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Notación</th>
+                <th>Nombre</th>
+                <th>Ejemplo Universitario</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>$O(1)$</td>
+                <td>Constante</td>
+                <td>Buscar a un estudiante sabiendo su número exacto de asiento.</td>
+              </tr>
+              <tr>
+                <td>$O(\log N)$</td>
+                <td>Logarítmico</td>
+                <td>Búsqueda binaria en una lista de asistencia ordenada por apellido.</td>
+              </tr>
+              <tr>
+                <td>$O(N)$</td>
+                <td>Lineal</td>
+                <td>Tomar asistencia nombrando uno por uno a los $N$ alumnos.</td>
+              </tr>
+              <tr>
+                <td>$O(N^2)$</td>
+                <td>Cuadrático</td>
+                <td>Comparar a cada alumno con todos los demás para formar parejas.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TEMA 4: PILAS Y COLAS -->
+      <!-- ========================================== -->
+      <section>
+        <section>
+          <span class="badge-tema">TEMA 4</span>
+          <h2>4. Estructuras Lineales: Pilas y Colas</h2>
+          <p style="font-size: 0.7em;">Operaciones Push, Pop, Colas Circulares y Principio FIFO/LIFO</p>
+        </section>
+
+        <section>
+          <h3>4.1 Pilas (Stack - LIFO)</h3>
+          <div class="card-analogia">
+            <strong>🥞 Principio LIFO (Last In, First Out):</strong> El último en entrar es el primero en salir.<br>
+            <strong>Ejemplo:</strong> La pila de exámenes entregados en el escritorio del docente. El último estudiante en dejar su examen lo pone encima de la pila, y será el primero que el docente revise.
+          </div>
+          <div class="card-box">
+            <ul>
+              <li><code>Push()</code>: Apilar / Insertar elemento en la cima.</li>
+              <li><code>Pop()</code>: Desapilar / Eliminar elemento de la cima.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section>
+          <h3>4.2 Colas (Queue - FIFO y Circulares)</h3>
+          <div class="card-analogia">
+            <strong>🚌 Principio FIFO (First In, First Out):</strong> El primero en llegar es el primero en ser atendido.<br>
+            <strong>Ejemplo:</strong> Fila en caja para pagar la matrícula.
+          </div>
+          <div class="card-box">
+            <strong>Cola Circular:</strong> Estructura donde el último posición se conecta nuevamente con la primera. Evita el desperdicio de memoria al reutilizar los espacios liberados por las operaciones de consumo.
+          </div>
+        </section>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TEMA 5: LISTAS ENLAZADAS -->
+      <!-- ========================================== -->
+      <section>
+        <section>
+          <span class="badge-tema">TEMA 5</span>
+          <h2>5. Listas Enlazadas</h2>
+          <p style="font-size: 0.7em;">Estructura de Nodos, Campos de Datos y Punteros de Enlace</p>
+        </section>
+
+        <section>
+          <h3>5.1 Estructura del Nodo</h3>
+          <div class="card-analogia">
+            <strong>🚂 Analogía del Tren / Búsqueda del Tesoro:</strong> Cada vagón (Nodo) contiene la carga (Dato) y un enganche metálico (Puntero `siguiente`) que se conecta con el siguiente vagón.
+          </div>
+          <pre><code class="language-cpp">struct Nodo {
+    int datoEstudiante;  // Carga útil de información
+    Nodo* siguiente;     // Puntero de enlace al siguiente Nodo
+};
+
+// Creación de un nodo individual
+Nodo* nuevoNodo = new Nodo();
+nuevoNodo->datoEstudiante = 95;
+nuevoNodo->siguiente = nullptr;</code></pre>
+        </section>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- TEMA 6: ANÁLISIS DE SOFTWARE Y AUDITORÍA -->
+      <!-- ========================================== -->
+      <section>
+        <section>
+          <span class="badge-tema">TEMA 6</span>
+          <h2>6. Auditoría de Eventos y Registros Before/After</h2>
+          <p style="font-size: 0.7em;">Trazabilidad de cambios, logs transaccionales e integridad de datos</p>
+        </section>
+
+        <section>
+          <h3>6.1 Registros Before / After</h3>
+          <div class="card-box">
+            Técnica de auditoría requerida en sistemas transaccionales para registrar la trazabilidad de cualquier modificación realizada en la base de datos o memoria.
+            <ul>
+              <li><strong>Before (Antes):</strong> Captura el estado original del registro antes de la operación.</li>
+              <li><strong>After (Después):</strong> Captura el estado resultante tras la ejecución del cambio.</li>
+            </ul>
+          </div>
+        </section>
+
+        <section>
+          <h3>6.2 Ejemplo de Tabla de Auditoría (PostgreSQL)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>ID Audit</th>
+                <th>Usuario</th>
+                <th>Acción</th>
+                <th>Valor Anterior (BEFORE)</th>
+                <th>Valor Nuevo (AFTER)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#1001</td>
+                <td>Ing. MACRO</td>
+                <td>UPDATE</td>
+                <td><code>{"nota": 45}</code></td>
+                <td><code>{"nota": 85}</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </section>
+
+    </div>
+    
+    <div class="footer-usb">
+      Universidad Salesiana de Bolivia - Ing. MACRO (Miguel Angel Cruz Ramos)
+    </div>
+  </div>
+
+  <!-- Scripts de Reveal.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/plugin/math/math.min.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: true,
+      transition: 'slide',
+      plugins: [ RevealMath.KaTeX ]
+    });
+    hljs.highlightAll();
+  </script>
+</body>
+</html>
